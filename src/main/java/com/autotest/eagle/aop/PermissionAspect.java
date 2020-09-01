@@ -5,6 +5,7 @@ package com.autotest.eagle.aop;
  * @date 2020/8/31 1:53 下午
  */
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.autotest.eagle.annotation.Permission;
 import com.autotest.eagle.dto.Response;
 import com.autotest.eagle.entity.User;
@@ -31,6 +32,7 @@ import java.lang.reflect.Method;
 public class PermissionAspect {
 
     private static final String FORBIDDEN = "对不起, 你没有足够的权限";
+    private static final String EXPIRED = "身份认证已过期";
 
     @Resource
     private HttpServletRequest request;
@@ -46,6 +48,10 @@ public class PermissionAspect {
         return Response.build(403, null, FORBIDDEN);
     }
 
+
+    private Response expired() {
+        return Response.build(401, null, EXPIRED);
+    }
 
     //这里使用环绕通知切入自定义的注解即可
     @Around("@annotation(com.autotest.eagle.annotation.Permission)")
@@ -66,12 +72,15 @@ public class PermissionAspect {
                     return setResponse();
                 }
                 User user = userService.getUserByToken(token);
+                request.setAttribute("user", user);
                 if (user == null || user.getDisabled() || user.getRole().getValue() < value.getValue()) {
                     return setResponse();
                 }
                 return point.proceed();
             }
 
+        } catch (TokenExpiredException e) {
+            return expired();
         } catch (Throwable e) {
             e.printStackTrace();
         }

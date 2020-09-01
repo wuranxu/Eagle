@@ -1,5 +1,6 @@
 package com.autotest.eagle.utils;
 
+import com.autotest.eagle.entity.User;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -65,5 +66,10 @@ public class RequestUtil {
             }
         }
         return new Page(current, size);
+    }
+
+    // 获取用户信息
+    public static User getUser(HttpServletRequest request) {
+        return (User) request.getAttribute("user");
     }
 }

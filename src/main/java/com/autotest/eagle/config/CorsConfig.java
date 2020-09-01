@@ -12,11 +12,8 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 public class CorsConfig {
-        private CorsConfiguration buildConfig() {
+    private CorsConfiguration buildConfig() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        // 24小时
-        // Long maxAge = new Long(86400);
-        // corsConfiguration.setMaxAge(maxAge);
         corsConfiguration.addAllowedOrigin("*"); //允许任何域名
         corsConfiguration.addAllowedHeader("*"); //允许任何头
         corsConfiguration.addAllowedMethod("*"); //允许任何方法

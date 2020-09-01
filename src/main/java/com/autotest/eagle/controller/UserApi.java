@@ -89,6 +89,5 @@ public class UserApi {
         } catch (NumberFormatException e) {
             return Response.build(501, null, "传入用户id不合法");
         }
-
     }
 }

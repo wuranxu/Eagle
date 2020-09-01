@@ -6,7 +6,6 @@ import com.autotest.eagle.mapper.UserMapper;
 import com.autotest.eagle.middleware.Jwt;
 import com.autotest.eagle.service.UserService;
 import com.autotest.eagle.utils.Sha1Util;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
