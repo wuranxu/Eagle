@@ -8,7 +8,6 @@ import com.autotest.eagle.enums.Role;
 import com.autotest.eagle.middleware.Jwt;
 import com.autotest.eagle.service.UserService;
 import com.autotest.eagle.utils.RequestUtil;
-import com.autotest.eagle.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.BindingResult;
@@ -23,7 +22,7 @@ import javax.validation.Valid;
  * @date 2020/8/31 3:16 下午
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @Slf4j
 public class UserApi {
     @Resource
@@ -31,7 +30,7 @@ public class UserApi {
 
     @PostMapping("/register")
     public Response registerUser(HttpServletRequest request, @Valid @RequestBody User user, BindingResult results) {
-        Response err = ResponseUtil.validate(results);
+        Response err = RequestUtil.validate(results);
         if (err != null) {
             return err;
         }
@@ -53,7 +52,7 @@ public class UserApi {
 
     @PostMapping("/login")
     public Response login(HttpServletRequest request, @Valid @RequestBody UserDto user, BindingResult results) {
-        Response err = ResponseUtil.validate(results);
+        Response err = RequestUtil.validate(results);
         if (err != null) {
             return err;
         }

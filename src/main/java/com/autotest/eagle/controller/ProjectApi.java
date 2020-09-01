@@ -7,7 +7,6 @@ import com.autotest.eagle.entity.User;
 import com.autotest.eagle.enums.Role;
 import com.autotest.eagle.service.ProjectService;
 import com.autotest.eagle.utils.RequestUtil;
-import com.autotest.eagle.utils.ResponseUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -24,7 +23,7 @@ import java.util.ArrayList;
  * @date 2020/9/1 11:04 上午
  */
 @RestController
-@RequestMapping("/project")
+@RequestMapping("/api/project")
 @Slf4j
 public class ProjectApi {
     @Resource
@@ -33,7 +32,7 @@ public class ProjectApi {
     @PostMapping("/insert")
     @Permission(Role.SuperAdmin)
     public Response insertProject(HttpServletRequest request, @Valid @RequestBody Project project, BindingResult results) {
-        Response err = ResponseUtil.validate(results);
+        Response err = RequestUtil.validate(results);
         if (err != null) {
             return err;
         }
@@ -56,7 +55,7 @@ public class ProjectApi {
     @PostMapping("/update")
     @Permission(Role.Guest)
     public Response updateProject(HttpServletRequest request, @Valid @RequestBody Project project, BindingResult results) {
-        Response err = ResponseUtil.validate(results);
+        Response err = RequestUtil.validate(results);
         if (err != null) {
             return err;
         }

@@ -1,12 +1,15 @@
 package com.autotest.eagle.utils;
 
+import com.autotest.eagle.dto.Response;
 import com.autotest.eagle.entity.User;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.validation.BindingResult;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
+import java.util.Objects;
 
 /**
  * @author wuranxu
@@ -71,5 +74,12 @@ public class RequestUtil {
     // 获取用户信息
     public static User getUser(HttpServletRequest request) {
         return (User) request.getAttribute("user");
+    }
+
+    public static Response validate(BindingResult results) {
+        if (results.hasErrors()) {
+            return new Response(501, null, Objects.requireNonNull(results.getFieldError()).getDefaultMessage());
+        }
+        return null;
     }
 }

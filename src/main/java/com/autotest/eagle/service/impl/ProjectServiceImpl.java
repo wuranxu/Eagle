@@ -91,4 +91,28 @@ public class ProjectServiceImpl implements ProjectService {
         LambdaQueryWrapper<Project> wrapper = query.lambda().like(!Strings.isEmpty(name), Project::getProjectName, name).orderByDesc(Project::getId);
         return projectMapper.listProjectByUser(page, user, wrapper);
     }
+
+    @Override
+    public Boolean deleteProjectMember(Long projectId, Long user) {
+        QueryWrapper<ProjectRole> query = new QueryWrapper<>();
+        return projectRoleMapper.delete(query.lambda().eq(ProjectRole::getProjectId, projectId).eq(ProjectRole::getUserId, user)) > 0;
+    }
+
+    @Override
+    public Boolean insertProjectMember(Long projectId, Long user, ProjRole role) {
+        ProjectRole projectRole = new ProjectRole();
+        projectRole.setUserId(user);
+        projectRole.setProjRole(role);
+        projectRole.setProjectId(projectId);
+        return projectRoleMapper.insert(projectRole) > 0;
+    }
+
+    @Override
+    public Boolean updateProjectMember(Long projectId, Long user, ProjRole role) {
+        ProjectRole projectRole = new ProjectRole();
+        projectRole.setProjRole(role);
+        UpdateWrapper<ProjectRole> wrapper = new UpdateWrapper<>();
+        wrapper.eq("project_id", projectId).eq("user_id", user);
+        return projectRoleMapper.update(projectRole, wrapper) > 0;
+    }
 }
