@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/eagle
     username: root
-    password: xx@33
+    password: fewf@33
     driver-class-name: com.mysql.cj.jdbc.Driver
 mybatis-plus:
   type-enums-package: com.autotest.eagle.enums
@@ -22,3 +22,8 @@ logging:
     com.autotest.eagle.mapper: info
   file:
     name: logs/common-logback.log
+
+qiniu:
+  AccessKey: CYl54wZe1VfwefwO-DXzMTbnX9VJXROrRjEFpCVdG-5PH
+  SecretKey: 6wpB7ZlNfewflP11YioLfQG404yCXyIScUJ_ws6W2D80
+  bucket: eagle-test

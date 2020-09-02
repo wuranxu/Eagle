@@ -3,6 +3,9 @@ package com.autotest.eagle.service;
 import com.autotest.eagle.entity.Project;
 import com.autotest.eagle.enums.ProjRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jdk.internal.util.xml.impl.Input;
+
+import java.io.InputStream;
 
 /**
  * @author wuranxu
@@ -28,4 +31,7 @@ public interface ProjectService {
 
     // 修改项目成员
     Boolean updateProjectMember(Long projectId, Long user, ProjRole role);
+
+    // 上传项目图片
+    Boolean uploadProjectPic(String filename, InputStream inputStream);
 }

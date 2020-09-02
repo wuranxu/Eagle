@@ -12,10 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -94,4 +97,28 @@ public class ProjectApi {
         }
         return Response.build(200, data, "请求成功");
     }
+
+    @PostMapping("/upload")
+    public Response uploadProjectFile(@RequestParam("file") MultipartFile file, @RequestParam("project_id") String projectId) {
+        if (file.isEmpty()) {
+            return Response.build(501, null, "上传失败, 文件为空");
+        }
+        String filename = file.getOriginalFilename();
+        if (filename != null && !filename.endsWith("jpg") && !filename.endsWith("jpeg")
+        && !filename.endsWith("png") && !filename.endsWith("gif")) {
+            return Response.build(501, null, "上传失败, 图片格式错误");
+        }
+        Boolean result;
+        try {
+            result = projectService.uploadProjectPic(projectId, file.getInputStream());
+        } catch (IOException e) {
+            log.error("上传图片失败, error: "+e.getMessage());
+            return Response.build(501, null, "上传图片失败");
+        }
+        if (!result) {
+            return Response.build(501, null, "上传图片失败");
+        }
+        return Response.build(200, null, "上传图片成功");
+    }
+
 }

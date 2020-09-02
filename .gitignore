@@ -36,3 +36,7 @@ build/
 logs
 
 .mvn
+
+src/main/resources/static
+
+.DS_Store

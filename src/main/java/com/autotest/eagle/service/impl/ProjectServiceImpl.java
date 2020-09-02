@@ -7,6 +7,7 @@ import com.autotest.eagle.enums.ProjRole;
 import com.autotest.eagle.enums.Role;
 import com.autotest.eagle.mapper.ProjectMapper;
 import com.autotest.eagle.mapper.ProjectRoleMapper;
+import com.autotest.eagle.middleware.OssClient;
 import com.autotest.eagle.service.ProjectService;
 import com.autotest.eagle.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,9 +15,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Objects;
 
@@ -35,6 +38,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Resource
     private UserService userService;
+
+    @Autowired
+    private OssClient oss;
 
     @Override
     public Boolean insertProject(Project project, Long user) throws Exception {
@@ -114,5 +120,10 @@ public class ProjectServiceImpl implements ProjectService {
         UpdateWrapper<ProjectRole> wrapper = new UpdateWrapper<>();
         wrapper.eq("project_id", projectId).eq("user_id", user);
         return projectRoleMapper.update(projectRole, wrapper) > 0;
+    }
+
+    @Override
+    public Boolean uploadProjectPic(String filename, InputStream inputStream) {
+        return oss.uploadFile(filename, inputStream);
     }
 }
