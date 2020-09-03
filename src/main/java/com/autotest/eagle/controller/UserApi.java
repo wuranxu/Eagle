@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author wuranxu
@@ -88,5 +89,12 @@ public class UserApi {
         } catch (NumberFormatException e) {
             return Response.build(501, null, "传入用户id不合法");
         }
+    }
+
+    @GetMapping("/list")
+    @Permission(Role.Guest)
+    public Response listUser() {
+        List<User> users = userService.listUser();
+        return Response.build(200, users, "操作成功");
     }
 }

@@ -2,6 +2,7 @@ package com.autotest.eagle.service.impl;
 
 import com.autotest.eagle.dto.UserDto;
 import com.autotest.eagle.entity.User;
+import com.autotest.eagle.enums.Role;
 import com.autotest.eagle.mapper.UserMapper;
 import com.autotest.eagle.middleware.Jwt;
 import com.autotest.eagle.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author wuranxu
@@ -37,6 +39,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return userMapper.selectById(id);
+    }
+
+    @Override
+    public List<User> listUser() {
+        return userMapper.selectList(null);
+    }
+
+    @Override
+    public Boolean isSuperAdmin(Long id) {
+        User user = userMapper.selectById(id);
+        return user != null && user.getRole() == Role.SuperAdmin;
     }
 
     @Override

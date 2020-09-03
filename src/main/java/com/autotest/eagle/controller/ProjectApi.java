@@ -5,6 +5,7 @@ import com.autotest.eagle.dto.Response;
 import com.autotest.eagle.entity.Project;
 import com.autotest.eagle.entity.User;
 import com.autotest.eagle.enums.Role;
+import com.autotest.eagle.exceptions.ForbiddenException;
 import com.autotest.eagle.service.ProjectService;
 import com.autotest.eagle.utils.RequestUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -17,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -99,20 +98,28 @@ public class ProjectApi {
     }
 
     @PostMapping("/upload")
-    public Response uploadProjectFile(@RequestParam("file") MultipartFile file, @RequestParam("project_id") String projectId) {
+    @Permission
+    public Response uploadProjectFile(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam("project_id") String projectId) {
         if (file.isEmpty()) {
             return Response.build(501, null, "上传失败, 文件为空");
         }
+        User user = RequestUtil.getUser(request);
         String filename = file.getOriginalFilename();
-        if (filename != null && !filename.endsWith("jpg") && !filename.endsWith("jpeg")
-        && !filename.endsWith("png") && !filename.endsWith("gif")) {
+        if (filename == null || (!filename.endsWith("jpg") && !filename.endsWith("jpeg")
+                && !filename.endsWith("png") && !filename.endsWith("gif"))) {
             return Response.build(501, null, "上传失败, 图片格式错误");
         }
+        int index = filename.lastIndexOf('.');
+        String suffix = filename.substring(index + 1);
         Boolean result;
         try {
-            result = projectService.uploadProjectPic(projectId, file.getInputStream());
-        } catch (IOException e) {
-            log.error("上传图片失败, error: "+e.getMessage());
+            String name = String.format("%s.%s", projectId, suffix);
+            result = projectService.uploadProjectPic(name, file.getInputStream());
+            projectService.updateProjectAvatar(Long.valueOf(projectId), user.getId(), name);
+        } catch (ForbiddenException e) {
+            return Response.build(403, null, e.getMessage());
+        } catch (Exception e) {
+            log.error("上传图片失败, error: " + e.getMessage());
             return Response.build(501, null, "上传图片失败");
         }
         if (!result) {

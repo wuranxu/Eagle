@@ -9,6 +9,7 @@ create table t_eagle_project
     update_time  datetime              not null,
     creator      bigint                not null,
     updater      bigint                not null,
+    avatar       varchar(16)           null,
     disabled     boolean default FALSE not null,
     constraint t_eagle_project_pk
         primary key (id)

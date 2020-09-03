@@ -15,6 +15,6 @@ import org.apache.ibatis.annotations.*;
  */
 public interface ProjectMapper extends BaseMapper<Project> {
 
-    @Select("select * from t_eagle_project where id in (SELECT project_id FROM t_eagle_project_role where user_id = #{userId}) ${ew.customSqlSegment}")
-    IPage<Project> listProjectByUser(IPage<Project> page, @Param("userId") Long userId, @Param(Constants.WRAPPER) LambdaQueryWrapper<Project> wrapper);
+    @Select("select * from t_eagle_project where id in (SELECT project_id FROM t_eagle_project_role where user_id = #{userId}) and project_name like '%${projectName}%'")
+    IPage<Project> listProjectByUser(IPage<Project> page, @Param("userId") Long userId, @Param("projectName") String projectName);
 }

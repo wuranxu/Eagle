@@ -4,6 +4,7 @@ import com.autotest.eagle.dto.UserDto;
 import com.autotest.eagle.entity.User;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 /**
  * @author wuranxu
@@ -13,6 +14,10 @@ public interface UserService {
     User getUserByToken(String token);
 
     User getUserById(Long id);
+
+    List<User> listUser();
+
+    Boolean isSuperAdmin(Long id);
 
     Boolean forbiddenUser(Long id);
 

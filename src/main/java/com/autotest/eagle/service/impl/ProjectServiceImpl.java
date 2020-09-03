@@ -5,6 +5,7 @@ import com.autotest.eagle.entity.ProjectRole;
 import com.autotest.eagle.entity.User;
 import com.autotest.eagle.enums.ProjRole;
 import com.autotest.eagle.enums.Role;
+import com.autotest.eagle.exceptions.ForbiddenException;
 import com.autotest.eagle.mapper.ProjectMapper;
 import com.autotest.eagle.mapper.ProjectRoleMapper;
 import com.autotest.eagle.middleware.OssClient;
@@ -74,6 +75,23 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.updateById(project) > 0;
     }
 
+    public Project update(Project project, Long user) {
+        project.setUpdater(user);
+        project.setUpdateTime(new Date());
+        return project;
+    }
+
+    @Override
+    public Boolean updateProjectAvatar(Long id, Long user, String filename) throws Exception {
+        Project project = projectMapper.selectById(id);
+        if (!Objects.equals(project.getOwner(), user) && !userService.isSuperAdmin(user)) {
+            throw new ForbiddenException();
+        }
+        update(project, user);
+        project.setAvatar(filename);
+        return projectMapper.updateById(project) > 0;
+    }
+
     @Override
     public Boolean deleteProject(Long projectId, Long user) {
         Project project = new Project();
@@ -93,9 +111,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public IPage<Project> listProjectByUser(IPage<Project> page, Long user, String name) {
-        QueryWrapper<Project> query = new QueryWrapper<>();
-        LambdaQueryWrapper<Project> wrapper = query.lambda().like(!Strings.isEmpty(name), Project::getProjectName, name).orderByDesc(Project::getId);
-        return projectMapper.listProjectByUser(page, user, wrapper);
+        return projectMapper.listProjectByUser(page, user, name);
     }
 
     @Override

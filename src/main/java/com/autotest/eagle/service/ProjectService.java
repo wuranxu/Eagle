@@ -3,7 +3,6 @@ package com.autotest.eagle.service;
 import com.autotest.eagle.entity.Project;
 import com.autotest.eagle.enums.ProjRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import jdk.internal.util.xml.impl.Input;
 
 import java.io.InputStream;
 
@@ -16,6 +15,8 @@ public interface ProjectService {
     Boolean insertProject(Project project, Long user) throws Exception;
 
     Boolean updateProject(Project project, Long user) throws Exception;
+
+    Boolean updateProjectAvatar(Long id, Long user, String filename) throws Exception;
 
     Boolean deleteProject(Long projectId, Long user);
 

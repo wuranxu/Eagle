@@ -41,6 +41,9 @@ public class Project {
     @TableField("updater")
     private Long updater;
 
+    @TableField("avatar")
+    private String avatar;
+
     @TableField("create_time")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
