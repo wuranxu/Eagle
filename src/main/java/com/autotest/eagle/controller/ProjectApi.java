@@ -54,6 +54,23 @@ public class ProjectApi {
         return Response.build(200, project, "创建成功");
     }
 
+    @GetMapping("/{projectId}")
+    @Permission(Role.Guest)
+    public Response queryProject(HttpServletRequest request, @PathVariable String projectId) {
+        Project project;
+        try {
+            Long projId = Long.valueOf(projectId);
+            User user = RequestUtil.getUser(request);
+            project = projectService.queryProjectById(projId, user.getId());
+        } catch (ForbiddenException e) {
+            return Response.build(403, null, e.getMessage());
+        } catch (Exception e) {
+            log.error("项目服务->获取项目失败, error: " + e.getMessage());
+            return Response.build(501, null, e.getMessage());
+        }
+        return Response.build(200, project, "操作成功");
+    }
+
     @PostMapping("/update")
     @Permission(Role.Guest)
     public Response updateProject(HttpServletRequest request, @Valid @RequestBody Project project, BindingResult results) {

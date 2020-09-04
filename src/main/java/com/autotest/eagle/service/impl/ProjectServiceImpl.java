@@ -115,6 +115,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project queryProjectById(Long id, Long user) throws ForbiddenException {
+        QueryWrapper<ProjectRole> query = new QueryWrapper<>();
+        ProjectRole projectRole = projectRoleMapper.selectOne(query.lambda().eq(ProjectRole::getProjectId, id).eq(ProjectRole::getUserId, user));
+        if (projectRole == null || projectRole.getProjRole().getValue() < ProjRole.MEMBER.getValue()) {
+            throw new ForbiddenException();
+        }
+        return projectMapper.selectById(id);
+    }
+
+    @Override
     public Boolean deleteProjectMember(Long projectId, Long user) {
         QueryWrapper<ProjectRole> query = new QueryWrapper<>();
         return projectRoleMapper.delete(query.lambda().eq(ProjectRole::getProjectId, projectId).eq(ProjectRole::getUserId, user)) > 0;

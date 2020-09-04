@@ -2,6 +2,7 @@ package com.autotest.eagle.service;
 
 import com.autotest.eagle.entity.Project;
 import com.autotest.eagle.enums.ProjRole;
+import com.autotest.eagle.exceptions.ForbiddenException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.io.InputStream;
@@ -23,6 +24,8 @@ public interface ProjectService {
     IPage<Project> listProject(IPage<Project> page, Long user, String name);
 
     IPage<Project> listProjectByUser(IPage<Project> page, Long user, String name);
+
+    Project queryProjectById(Long id, Long user) throws ForbiddenException;
 
     // 删除项目成员
     Boolean deleteProjectMember(Long projectId, Long user);
