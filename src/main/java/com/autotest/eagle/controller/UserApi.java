@@ -29,6 +29,11 @@ public class UserApi {
     @Resource
     private UserService userService;
 
+    @GetMapping(value = "/**")
+    public String index() {
+        return "index";
+    }
+
     @PostMapping("/register")
     public Response registerUser(HttpServletRequest request, @Valid @RequestBody User user, BindingResult results) {
         Response err = RequestUtil.validate(results);
