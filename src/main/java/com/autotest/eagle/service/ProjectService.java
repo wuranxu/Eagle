@@ -1,11 +1,13 @@
 package com.autotest.eagle.service;
 
 import com.autotest.eagle.entity.Project;
+import com.autotest.eagle.entity.ProjectRole;
 import com.autotest.eagle.enums.ProjRole;
 import com.autotest.eagle.exceptions.ForbiddenException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author wuranxu
@@ -38,4 +40,7 @@ public interface ProjectService {
 
     // 上传项目图片
     Boolean uploadProjectPic(String filename, InputStream inputStream);
+
+    // 获取项目成员列表
+    List<ProjectRole> listProjectRole(Long projectId);
 }

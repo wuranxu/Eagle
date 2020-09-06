@@ -3,6 +3,7 @@ package com.autotest.eagle.controller;
 import com.autotest.eagle.annotation.Permission;
 import com.autotest.eagle.dto.Response;
 import com.autotest.eagle.entity.Project;
+import com.autotest.eagle.entity.ProjectRole;
 import com.autotest.eagle.entity.User;
 import com.autotest.eagle.enums.Role;
 import com.autotest.eagle.exceptions.ForbiddenException;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author wuranxu
@@ -143,6 +145,19 @@ public class ProjectApi {
             return Response.build(501, null, "上传图片失败");
         }
         return Response.build(200, null, "上传图片成功");
+    }
+
+    @GetMapping("/{projectId}/members")
+    @Permission
+    public Response listProjectRole(@PathVariable String projectId) {
+        try {
+            Long projId = Long.valueOf(projectId);
+            List<ProjectRole> projectRoles = projectService.listProjectRole(projId);
+            return Response.build(200, projectRoles, "操作成功");
+        } catch (Exception e) {
+            log.error("项目服务->获取项目失败, error: " + e.getMessage());
+            return Response.build(501, new ArrayList<>(), e.getMessage());
+        }
     }
 
 }

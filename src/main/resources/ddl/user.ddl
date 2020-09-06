@@ -5,6 +5,7 @@ create table t_eagle_user
 	nickname            varchar(24) not null,
 	name                varchar(10) not null,
 	password            varchar(64) not null,
+	avatar              varchar(16) null,
 	tel                 varchar(12) not null,
 	role                integer default 0 not null,
 	create_time datetime default NOW() not null,

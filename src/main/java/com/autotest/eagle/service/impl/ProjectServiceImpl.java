@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -151,5 +152,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Boolean uploadProjectPic(String filename, InputStream inputStream) {
         return oss.uploadFile(filename, inputStream);
+    }
+
+    @Override
+    public List<ProjectRole> listProjectRole(Long projectId) {
+        QueryWrapper<ProjectRole> query = new QueryWrapper<>();
+        return projectRoleMapper.selectList(query.lambda().eq(ProjectRole::getProjectId, projectId));
     }
 }

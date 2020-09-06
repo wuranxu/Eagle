@@ -57,6 +57,9 @@ public class User {
     @TableField("last_login_ip")
     private String lastLoginIp;
 
+    @TableField("avatar")
+    private String avatar;
+
     @TableField("disabled")
     private Boolean disabled;
 
