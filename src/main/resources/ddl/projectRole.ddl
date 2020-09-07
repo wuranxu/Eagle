@@ -15,3 +15,5 @@ create index t_eagle_project_role_project_id_index
 create index t_eagle_project_role_user_id_index
 	on t_eagle_project_role (user_id);
 
+create unique index t_eagle_project_role_user_id_project_id_uindex
+	on t_eagle_project_role (user_id, project_id);
