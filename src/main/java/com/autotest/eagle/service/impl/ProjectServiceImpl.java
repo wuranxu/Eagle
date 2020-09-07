@@ -54,12 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (projectMapper.insert(project) == 0) {
             throw new Exception("添加项目失败");
         }
-        // 自动将管理员设置为项目组长
-        ProjectRole role = new ProjectRole();
-        role.setProjectId(project.getId());
-        role.setProjRole(ProjRole.OWNER);
-        role.setUserId(project.getOwner());
-        return projectRoleMapper.insert(role) > 0;
+        return true;
     }
 
     @Override
@@ -116,37 +111,62 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project queryProjectById(Long id, Long user) throws ForbiddenException {
+    public Project queryProjectById(Long id, Long user) throws Exception {
+        if (isOwnerOrAdmin(id, user)) {
+            return projectMapper.selectById(id);
+        }
         QueryWrapper<ProjectRole> query = new QueryWrapper<>();
         ProjectRole projectRole = projectRoleMapper.selectOne(query.lambda().eq(ProjectRole::getProjectId, id).eq(ProjectRole::getUserId, user));
-        if (projectRole == null || projectRole.getProjRole().getValue() < ProjRole.MEMBER.getValue()) {
+        if (projectRole == null) {
             throw new ForbiddenException();
         }
         return projectMapper.selectById(id);
     }
 
     @Override
-    public Boolean deleteProjectMember(Long projectId, Long user) {
+    public Boolean deleteProjectMember(Long user, Long projectId, Long uid) throws Exception {
+        if (!isOwnerOrAdmin(projectId, user) && !isAdminForProject(projectId, user)) {
+            throw new ForbiddenException();
+        }
         QueryWrapper<ProjectRole> query = new QueryWrapper<>();
-        return projectRoleMapper.delete(query.lambda().eq(ProjectRole::getProjectId, projectId).eq(ProjectRole::getUserId, user)) > 0;
+        return projectRoleMapper.delete(query.lambda().eq(ProjectRole::getProjectId, projectId).eq(ProjectRole::getUserId, uid)) > 0;
+    }
+
+    public boolean isOwnerOrAdmin(Long projectId, Long user) throws Exception {
+        Project project = projectMapper.selectById(projectId);
+        if (project == null) {
+            throw new Exception("项目不存在");
+        }
+        return userService.isSuperAdmin(user) || Objects.equals(user, project.getOwner());
+    }
+
+    public boolean isAdminForProject(Long projectId, Long user) {
+        QueryWrapper<ProjectRole> query = new QueryWrapper<>();
+        ProjectRole projectRole = projectRoleMapper.selectOne(query.lambda().eq(ProjectRole::getProjectId, projectId).eq(ProjectRole::getUserId, user));
+        return projectRole != null && projectRole.getProjRole() == ProjRole.ADMIN;
     }
 
     @Override
-    public Boolean insertProjectMember(Long projectId, Long user, ProjRole role) {
-        ProjectRole projectRole = new ProjectRole();
-        projectRole.setUserId(user);
-        projectRole.setProjRole(role);
-        projectRole.setProjectId(projectId);
-        return projectRoleMapper.insert(projectRole) > 0;
+    public Boolean insertProjectMember(Long user, ProjectRole role) throws Exception {
+        Project project = projectMapper.selectById(role.getProjectId());
+        if (project == null) {
+            throw new Exception("项目不存在");
+        }
+        if (Objects.equals(project.getOwner(), role.getUserId())) {
+            throw new Exception("不能添加组长");
+        }
+        if (!userService.isSuperAdmin(user) && Objects.equals(user, project.getOwner()) && !isAdminForProject(role.getProjectId(), user)) {
+            throw new ForbiddenException();
+        }
+        return projectRoleMapper.insert(role) > 0;
     }
 
     @Override
-    public Boolean updateProjectMember(Long projectId, Long user, ProjRole role) {
-        ProjectRole projectRole = new ProjectRole();
-        projectRole.setProjRole(role);
-        UpdateWrapper<ProjectRole> wrapper = new UpdateWrapper<>();
-        wrapper.eq("project_id", projectId).eq("user_id", user);
-        return projectRoleMapper.update(projectRole, wrapper) > 0;
+    public Boolean updateProjectMember(Long user, ProjectRole role) throws Exception {
+        if (!isOwnerOrAdmin(role.getProjectId(), user) && !isAdminForProject(role.getProjectId(), user)) {
+            throw new ForbiddenException();
+        }
+        return projectRoleMapper.updateById(role) > 0;
     }
 
     @Override

@@ -12,7 +12,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProjRole implements IEnum<Integer> {
     MEMBER(0, "组员"),
-    OWNER(1, "组长");
+    ADMIN(1, "组长"),
+    OWNER(2, "管理员");
 
     private int value;
     private String desc;

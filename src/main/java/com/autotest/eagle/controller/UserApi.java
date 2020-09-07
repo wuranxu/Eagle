@@ -29,11 +29,6 @@ public class UserApi {
     @Resource
     private UserService userService;
 
-    @GetMapping(value = "/**")
-    public String index() {
-        return "index";
-    }
-
     @PostMapping("/register")
     public Response registerUser(HttpServletRequest request, @Valid @RequestBody User user, BindingResult results) {
         Response err = RequestUtil.validate(results);
@@ -45,7 +40,7 @@ public class UserApi {
             String ip = RequestUtil.getIpAddress(request);
             result = userService.registerUser(user, ip);
         } catch (DuplicateKeyException e) {
-            return Response.build(503, null, "注册失败, 该用户已存在");
+            return Response.build(503, null, "注册失败, 用户邮箱/手机号/用户名重复");
         } catch (Exception e) {
             log.error("business => 用户服务: 注册用户失败, error: " + e);
             return Response.build(503, null, "注册失败");
@@ -53,6 +48,7 @@ public class UserApi {
         if (!result) {
             return Response.build(503, null, "注册失败");
         }
+        user.setToken(Jwt.createToken(user.getId(), user.getName()));
         return Response.build(200, user, "注册成功");
     }
 

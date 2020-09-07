@@ -2,7 +2,6 @@ package com.autotest.eagle.service;
 
 import com.autotest.eagle.entity.Project;
 import com.autotest.eagle.entity.ProjectRole;
-import com.autotest.eagle.enums.ProjRole;
 import com.autotest.eagle.exceptions.ForbiddenException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -27,16 +26,16 @@ public interface ProjectService {
 
     IPage<Project> listProjectByUser(IPage<Project> page, Long user, String name);
 
-    Project queryProjectById(Long id, Long user) throws ForbiddenException;
+    Project queryProjectById(Long id, Long user) throws ForbiddenException, Exception;
 
     // 删除项目成员
-    Boolean deleteProjectMember(Long projectId, Long user);
+    Boolean deleteProjectMember(Long user, Long projectId, Long uid) throws Exception;
 
     // 添加项目成员
-    Boolean insertProjectMember(Long projectId, Long user, ProjRole role);
+    Boolean insertProjectMember(Long user, ProjectRole role) throws ForbiddenException, Exception;
 
     // 修改项目成员
-    Boolean updateProjectMember(Long projectId, Long user, ProjRole role);
+    Boolean updateProjectMember(Long user, ProjectRole role) throws ForbiddenException, Exception;
 
     // 上传项目图片
     Boolean uploadProjectPic(String filename, InputStream inputStream);

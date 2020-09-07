@@ -160,4 +160,23 @@ public class ProjectApi {
         }
     }
 
+    @PostMapping("/role/insert")
+    @Permission
+    public Response insertProjectRole(HttpServletRequest request, @RequestBody ProjectRole role) {
+        System.out.println(role);
+        try {
+            User user = RequestUtil.getUser(request);
+            if (projectService.insertProjectMember(user.getId(), role)) {
+                return Response.build(200, null, "添加成功");
+            }
+            return Response.build(501, null, "添加失败");
+        } catch (DuplicateKeyException e) {
+            return Response.build(502, null, "添加失败, 用户已存在");
+        } catch (ForbiddenException e) {
+            return Response.build(403, null, e.getMessage());
+        } catch (Exception e) {
+            log.error("项目服务->添加项目角色失败, error: " + e.getMessage());
+            return Response.build(501, new ArrayList<>(), e.getMessage());
+        }
+    }
 }
