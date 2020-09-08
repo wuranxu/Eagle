@@ -26,16 +26,16 @@ public interface ProjectService {
 
     IPage<Project> listProjectByUser(IPage<Project> page, Long user, String name);
 
-    Project queryProjectById(Long id, Long user) throws ForbiddenException, Exception;
+    Project queryProjectById(Long id, Long user) throws Exception;
 
     // 删除项目成员
-    Boolean deleteProjectMember(Long user, Long projectId, Long uid) throws Exception;
+    Boolean deleteProjectMember(Long user, ProjectRole role) throws Exception;
 
     // 添加项目成员
-    Boolean insertProjectMember(Long user, ProjectRole role) throws ForbiddenException, Exception;
+    Boolean insertProjectMember(Long user, ProjectRole role) throws Exception;
 
     // 修改项目成员
-    Boolean updateProjectMember(Long user, ProjectRole role) throws ForbiddenException, Exception;
+    Boolean updateProjectMember(Long user, ProjectRole role) throws Exception;
 
     // 上传项目图片
     Boolean uploadProjectPic(String filename, InputStream inputStream);

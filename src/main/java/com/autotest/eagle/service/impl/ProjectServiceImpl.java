@@ -124,12 +124,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Boolean deleteProjectMember(Long user, Long projectId, Long uid) throws Exception {
-        if (!isOwnerOrAdmin(projectId, user) && !isAdminForProject(projectId, user)) {
+    public Boolean deleteProjectMember(Long user, ProjectRole role) throws Exception {
+        if (!isOwnerOrAdmin(role.getProjectId(), user) && !isAdminForProject(role.getProjectId(), user)) {
             throw new ForbiddenException();
         }
         QueryWrapper<ProjectRole> query = new QueryWrapper<>();
-        return projectRoleMapper.delete(query.lambda().eq(ProjectRole::getProjectId, projectId).eq(ProjectRole::getUserId, uid)) > 0;
+        return projectRoleMapper.delete(query.lambda().eq(ProjectRole::getProjectId, role.getProjectId())
+                .eq(ProjectRole::getUserId, role.getUserId())) > 0;
     }
 
     public boolean isOwnerOrAdmin(Long projectId, Long user) throws Exception {
@@ -155,7 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (Objects.equals(project.getOwner(), role.getUserId())) {
             throw new Exception("不能添加组长");
         }
-        if (!userService.isSuperAdmin(user) && Objects.equals(user, project.getOwner()) && !isAdminForProject(role.getProjectId(), user)) {
+        if (!userService.isSuperAdmin(user) && !Objects.equals(user, project.getOwner()) && !isAdminForProject(role.getProjectId(), user)) {
             throw new ForbiddenException();
         }
         return projectRoleMapper.insert(role) > 0;

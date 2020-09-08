@@ -163,7 +163,6 @@ public class ProjectApi {
     @PostMapping("/role/insert")
     @Permission
     public Response insertProjectRole(HttpServletRequest request, @RequestBody ProjectRole role) {
-        System.out.println(role);
         try {
             User user = RequestUtil.getUser(request);
             if (projectService.insertProjectMember(user.getId(), role)) {
@@ -177,6 +176,40 @@ public class ProjectApi {
         } catch (Exception e) {
             log.error("项目服务->添加项目角色失败, error: " + e.getMessage());
             return Response.build(501, new ArrayList<>(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/role/update")
+    @Permission
+    public Response updateProjectRole(HttpServletRequest request, @RequestBody ProjectRole role) {
+        try {
+            User user = RequestUtil.getUser(request);
+            if (projectService.updateProjectMember(user.getId(), role)) {
+                return Response.build(200, null, "更新成功");
+            }
+            return Response.build(501, null, "更新失败");
+        } catch (ForbiddenException e) {
+            return Response.build(403, null, e.getMessage());
+        } catch (Exception e) {
+            log.error("项目服务->修改项目角色失败, error: " + e.getMessage());
+            return Response.build(501, new ArrayList<>(), e.getMessage());
+        }
+    }
+
+    @PostMapping("/role/delete")
+    @Permission
+    public Response deleteProjectRole(HttpServletRequest request, @RequestBody ProjectRole role) {
+        try {
+            User user = RequestUtil.getUser(request);
+            if (projectService.deleteProjectMember(user.getId(), role)) {
+                return Response.build(200, null, "删除成功");
+            }
+            return Response.build(501, null, "删除失败");
+        } catch (ForbiddenException e) {
+            return Response.build(403, null, e.getMessage());
+        } catch (Exception e) {
+            log.error("项目服务->删除项目角色失败, error: " + e.getMessage());
+            return Response.build(501, null, e.getMessage());
         }
     }
 }
