@@ -45,15 +45,15 @@ public class ProjectApi {
             User user = RequestUtil.getUser(request);
             result = projectService.insertProject(project, user.getId());
         } catch (DuplicateKeyException e) {
-            return Response.build(503, null, "创建失败, 该项目已存在");
+            return Response.error("创建失败, 该项目已存在");
         } catch (Exception e) {
             log.error("项目服务->新增项目失败, error: " + e.getMessage());
-            return Response.build(501, null, e.getMessage());
+            return Response.error(e.getMessage());
         }
         if (!result) {
-            return Response.build(501, null, "创建失败");
+            return Response.error("创建失败");
         }
-        return Response.build(200, project, "创建成功");
+        return Response.success(project, "创建成功");
     }
 
     @GetMapping("/{projectId}")
@@ -65,12 +65,12 @@ public class ProjectApi {
             User user = RequestUtil.getUser(request);
             project = projectService.queryProjectById(projId, user.getId());
         } catch (ForbiddenException e) {
-            return Response.build(403, null, e.getMessage());
+            return Response.forbidden();
         } catch (Exception e) {
             log.error("项目服务->获取项目失败, error: " + e.getMessage());
-            return Response.build(501, null, e.getMessage());
+            return Response.error(e.getMessage());
         }
-        return Response.build(200, project, "操作成功");
+        return Response.success(project, "操作成功");
     }
 
     @PostMapping("/update")
@@ -85,15 +85,15 @@ public class ProjectApi {
             User user = RequestUtil.getUser(request);
             result = projectService.updateProject(project, user.getId());
         } catch (DuplicateKeyException e) {
-            return Response.build(503, null, "修改失败, 已存在该项目名");
+            return Response.error("修改失败, 已存在该项目名");
         } catch (Exception e) {
             log.error("项目服务->修改项目失败, error: " + e.getMessage());
-            return Response.build(501, null, e.getMessage());
+            return Response.error(e.getMessage());
         }
         if (!result) {
-            return Response.build(501, null, "修改失败");
+            return Response.error("修改失败");
         }
-        return Response.build(200, project, "修改成功");
+        return Response.success("修改成功");
     }
 
 
@@ -111,22 +111,22 @@ public class ProjectApi {
                 data = projectService.listProjectByUser(page, user.getId(), projectName);
             }
         } catch (Exception e) {
-            return Response.build(501, new ArrayList<>(), e.getMessage());
+            return Response.error(new ArrayList<>(), e.getMessage());
         }
-        return Response.build(200, data, "请求成功");
+        return Response.success(data, "请求成功");
     }
 
     @PostMapping("/upload")
     @Permission
     public Response uploadProjectFile(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam("project_id") String projectId) {
         if (file.isEmpty()) {
-            return Response.build(501, null, "上传失败, 文件为空");
+            return Response.error("上传失败, 文件为空");
         }
         User user = RequestUtil.getUser(request);
         String filename = file.getOriginalFilename();
         if (filename == null || (!filename.endsWith("jpg") && !filename.endsWith("jpeg")
                 && !filename.endsWith("png") && !filename.endsWith("gif"))) {
-            return Response.build(501, null, "上传失败, 图片格式错误");
+            return Response.error("上传失败, 图片格式错误");
         }
         int index = filename.lastIndexOf('.');
         String suffix = filename.substring(index + 1);
@@ -136,15 +136,15 @@ public class ProjectApi {
             result = projectService.uploadProjectPic(name, file.getInputStream());
             projectService.updateProjectAvatar(Long.valueOf(projectId), user.getId(), name);
         } catch (ForbiddenException e) {
-            return Response.build(403, null, e.getMessage());
+            return Response.forbidden();
         } catch (Exception e) {
             log.error("上传图片失败, error: " + e.getMessage());
-            return Response.build(501, null, "上传图片失败");
+            return Response.error("上传图片失败");
         }
         if (!result) {
-            return Response.build(501, null, "上传图片失败");
+            return Response.error("上传图片失败");
         }
-        return Response.build(200, null, "上传图片成功");
+        return Response.success("上传图片成功");
     }
 
     @GetMapping("/{projectId}/members")
@@ -153,10 +153,10 @@ public class ProjectApi {
         try {
             Long projId = Long.valueOf(projectId);
             List<ProjectRole> projectRoles = projectService.listProjectRole(projId);
-            return Response.build(200, projectRoles, "操作成功");
+            return Response.success(projectRoles, "操作成功");
         } catch (Exception e) {
             log.error("项目服务->获取项目失败, error: " + e.getMessage());
-            return Response.build(501, new ArrayList<>(), e.getMessage());
+            return Response.error(new ArrayList<>(), e.getMessage());
         }
     }
 
@@ -166,16 +166,16 @@ public class ProjectApi {
         try {
             User user = RequestUtil.getUser(request);
             if (projectService.insertProjectMember(user.getId(), role)) {
-                return Response.build(200, null, "添加成功");
+                return Response.success("添加成功");
             }
-            return Response.build(501, null, "添加失败");
+            return Response.error("添加失败");
         } catch (DuplicateKeyException e) {
-            return Response.build(502, null, "添加失败, 用户已存在");
+            return Response.error("添加失败, 用户已存在");
         } catch (ForbiddenException e) {
-            return Response.build(403, null, e.getMessage());
+            return Response.forbidden();
         } catch (Exception e) {
             log.error("项目服务->添加项目角色失败, error: " + e.getMessage());
-            return Response.build(501, new ArrayList<>(), e.getMessage());
+            return Response.error(new ArrayList<>(), e.getMessage());
         }
     }
 
@@ -185,14 +185,14 @@ public class ProjectApi {
         try {
             User user = RequestUtil.getUser(request);
             if (projectService.updateProjectMember(user.getId(), role)) {
-                return Response.build(200, null, "更新成功");
+                return Response.success("更新成功");
             }
-            return Response.build(501, null, "更新失败");
+            return Response.error("更新失败");
         } catch (ForbiddenException e) {
-            return Response.build(403, null, e.getMessage());
+            return Response.forbidden();
         } catch (Exception e) {
             log.error("项目服务->修改项目角色失败, error: " + e.getMessage());
-            return Response.build(501, new ArrayList<>(), e.getMessage());
+            return Response.error(new ArrayList<>(), e.getMessage());
         }
     }
 
@@ -202,14 +202,14 @@ public class ProjectApi {
         try {
             User user = RequestUtil.getUser(request);
             if (projectService.deleteProjectMember(user.getId(), role)) {
-                return Response.build(200, null, "删除成功");
+                return Response.success("删除成功");
             }
-            return Response.build(501, null, "删除失败");
+            return Response.error("删除失败");
         } catch (ForbiddenException e) {
-            return Response.build(403, null, e.getMessage());
+            return Response.forbidden();
         } catch (Exception e) {
             log.error("项目服务->删除项目角色失败, error: " + e.getMessage());
-            return Response.build(501, null, e.getMessage());
+            return Response.error(e.getMessage());
         }
     }
 }

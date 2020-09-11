@@ -40,16 +40,16 @@ public class UserApi {
             String ip = RequestUtil.getIpAddress(request);
             result = userService.registerUser(user, ip);
         } catch (DuplicateKeyException e) {
-            return Response.build(503, null, "注册失败, 用户邮箱/手机号/用户名重复");
+            return Response.error("注册失败, 用户邮箱/手机号/用户名重复");
         } catch (Exception e) {
             log.error("business => 用户服务: 注册用户失败, error: " + e);
-            return Response.build(503, null, "注册失败");
+            return Response.error("注册失败");
         }
         if (!result) {
-            return Response.build(503, null, "注册失败");
+            return Response.error("注册失败");
         }
         user.setToken(Jwt.createToken(user.getId(), user.getName()));
-        return Response.build(200, user, "注册成功");
+        return Response.success(user, "注册成功");
     }
 
     @PostMapping("/login")
@@ -63,18 +63,18 @@ public class UserApi {
             String ip = RequestUtil.getIpAddress(request);
             data = userService.login(user, ip);
             if (data == null) {
-                return Response.build(501, null, "账号或密码错误");
+                return Response.error("账号或密码错误");
             }
             String token = Jwt.createToken(data.getId(), data.getName());
             if (token == null) {
-                return Response.build(500, null, "登录失败");
+                return Response.error("登录失败");
             }
             data.setToken(token);
         } catch (Exception e) {
             log.error("business => 用户服务 登录失败, error: " + e.getMessage());
-            return Response.build(500, null, e.getMessage());
+            return Response.error(e.getMessage());
         }
-        return Response.build(200, data, "登录成功");
+        return Response.success(data, "登录成功");
     }
 
     @GetMapping("/forbidden/{userId}")
@@ -84,11 +84,11 @@ public class UserApi {
             Long value = Long.valueOf(userId);
             Boolean result = userService.forbiddenUser(value);
             if (result) {
-                return Response.build(500, null, "禁用失败");
+                return Response.error("禁用失败");
             }
-            return Response.build(200, null, "禁用成功");
+            return Response.success("禁用成功");
         } catch (NumberFormatException e) {
-            return Response.build(501, null, "传入用户id不合法");
+            return Response.error("传入用户id不合法");
         }
     }
 
@@ -96,6 +96,6 @@ public class UserApi {
     @Permission(Role.Guest)
     public Response listUser() {
         List<User> users = userService.listUser();
-        return Response.build(200, users, "操作成功");
+        return Response.success(users, "操作成功");
     }
 }

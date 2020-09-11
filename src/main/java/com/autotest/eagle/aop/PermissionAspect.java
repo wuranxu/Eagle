@@ -31,9 +31,6 @@ import java.lang.reflect.Method;
 @Component
 public class PermissionAspect {
 
-    private static final String FORBIDDEN = "对不起, 你没有足够的权限";
-    private static final String EXPIRED = "身份认证已过期";
-
     @Resource
     private HttpServletRequest request;
 
@@ -44,14 +41,10 @@ public class PermissionAspect {
     private UserService userService;
 
 
-    private Response setResponse() {
-        return Response.build(403, null, FORBIDDEN);
+    private Response forbidden() {
+        return Response.forbidden();
     }
 
-
-    private Response expired() {
-        return Response.build(401, null, EXPIRED);
-    }
 
     //这里使用环绕通知切入自定义的注解即可
     @Around("@annotation(com.autotest.eagle.annotation.Permission)")
@@ -69,18 +62,23 @@ public class PermissionAspect {
                 Role value = annotation.value();
                 String token = request.getHeader("token");
                 if (StringUtils.isEmpty(token)) {
-                    return setResponse();
+                    return Response.notLogin();
                 }
                 User user = userService.getUserByToken(token);
                 request.setAttribute("user", user);
-                if (user == null || user.getDisabled() || user.getRole().getValue() < value.getValue()) {
-                    return setResponse();
+                if (user == null) {
+                    return Response.notLogin();
+                }
+                if (user.getDisabled()) {
+                    return Response.notAllowed();
+                }
+                if (user.getRole().getValue() < value.getValue()) {
+                    return forbidden();
                 }
                 return point.proceed();
             }
-
         } catch (TokenExpiredException e) {
-            return expired();
+            return Response.expired();
         } catch (Throwable e) {
             e.printStackTrace();
         }
